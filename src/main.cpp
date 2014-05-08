@@ -3,7 +3,7 @@
 #include "Script.h"
 #include <fstream>
 #include <string>
-#include <pthread.h>
+#include <thread>
 #include "GLShapeRenderer.h"
 #include "Interface.h"
 

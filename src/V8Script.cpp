@@ -4,6 +4,7 @@
 #include "ShapeManager.h"
 #include <stdint.h>
 #include "Interface.h"
+#include "v8.h"
 
 using std::cout;
 using std::endl;
@@ -38,12 +39,12 @@ GameScript::~GameScript() {
 	
 }
 
-V8Script::V8Script(const std::string& program) : program(program) {
+V8Script::V8Script(const std::string& program) : program(program), isolate(Isolate::New()) {
 	
 }
 
 V8Script::~V8Script() {
-	
+	isolate->Dispose();
 }
 
 template<class T>
@@ -342,6 +343,8 @@ void getMouseY(const v8::FunctionCallbackInfo<v8::Value>& args) {
 
 void V8Script::run(ShapeManager2d& pb) {
 	
+	isolate->Enter();
+	
 	// Create a stack-allocated handle scope.
 	HandleScope handle_scope(Isolate::GetCurrent());
 	
@@ -432,10 +435,10 @@ void V8Script::run(ShapeManager2d& pb) {
 		//pb.clear();
 	//}
 	
-	// Dispose the persistent context.
+	isolate->Exit();
 }
 
 void V8Script::terminate() {
-	V8::TerminateExecution();
+	V8::TerminateExecution(Isolate::GetCurrent());
 }
 

@@ -2,8 +2,11 @@
 #define SCRIPT_H
 
 #include "ShapeManager.h"
-#include "v8.h"
 #include <string>
+
+namespace v8 {
+	class Isolate;
+}
 
 /**
  * Represents a script that is producing some output on the screen, whether it is local or remote.
@@ -31,6 +34,7 @@ public:
 class V8Script : public GameScript {
 private:
 	std::string program;
+	v8::Isolate* isolate;
 public:
 	V8Script(const std::string& program);
 	V8Script(const V8Script&) = delete;
