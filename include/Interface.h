@@ -5,6 +5,9 @@
 #include <SDL.h>
 #include <SDL_thread.h>
 #include <vector>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
 /**
  * Represents a single item that is drawn on the screen, which has the opportunity to accept input events.
@@ -35,12 +38,12 @@ public:
  */
 class Interface {
 private:
-	static SDL_Thread* renderThread;
-	static SDL_mutex* graphicsMutex;
-	static SDL_cond* graphicsCond;
+	static std::thread renderThread;
+	static std::mutex graphicsMutex;
+	static std::condition_variable graphicsCond;
 	static std::vector<GraphicsComponent*> components;
 	
-	static int renderFunc(void*);
+	static void renderFunc();
 public:
 	Interface() = delete;
 	Interface(const Interface&) = delete;
