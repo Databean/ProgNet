@@ -8,6 +8,7 @@
 #include <string>
 #include <ostream>
 #include <sstream>
+#include <functional>
 #include "PixelBuffer.h"
 #include "Util.h"
 
@@ -15,6 +16,9 @@
  * Represents the various types of shapes that can be drawn by the user.
  */
 enum ShapeType { SHAPE_TRIANGLE, SHAPE_QUAD, SHAPE_POINT, SHAPE_LINE, SHAPE_POLYGON, SHAPE_TRIANGLE_FAN, SHAPE_NONE };
+
+template<unsigned int dim, class CoordType>
+class ShapeManagerObserver;
 
 /**
  * Represents a coordinate in n-dimensional space, templated to have the type system enforce lengths
@@ -391,6 +395,7 @@ template<unsigned int dim, class CoordType>
 class ShapeManager {
 private:
 	std::map<unsigned int, Shape<dim, CoordType>> shapes;
+	std::vector<std::reference_wrapper<ShapeManagerObserver<dim, CoordType>>> observers;
 	unsigned int count;
 public:
 	typedef Point<dim, CoordType> PointType;
@@ -472,10 +477,25 @@ public:
 	inline void clear() {
 		shapes.clear();
 	}
+	
+	inline void addObserver(ShapeManagerObserver<dim, CoordType>& observer) {
+		observers.push_back(std::ref(observer));
+	}
 };
 
 typedef ShapeManager<2, double> ShapeManager2d;
 typedef ShapeManager<2, float> ShapeManager2f;
 typedef ShapeManager<2, int> ShapeManager2i;
+
+template<unsigned int dim, class CoordType>
+class ShapeManagerObserver {
+public:
+	ShapeManagerObserver() = default;
+	ShapeManagerObserver(const ShapeManagerObserver&) = delete;
+	virtual ~ShapeManagerObserver() = default;
+	virtual ShapeManagerObserver& operator=(const ShapeManagerObserver&) = delete;
+	
+	virtual void update(const ShapeManager<dim, CoordType>& shapeManager, const Shape<dim, CoordType>& shape) = 0;
+};
 
 #endif
