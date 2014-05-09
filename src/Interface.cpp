@@ -41,7 +41,18 @@ void Interface::renderFunc() {
 		exit(sdlStatus);
 	}
 	
-	SDL_Surface* window = SDL_SetVideoMode(windowWidth, windowHeight, 32, SDL_HWSURFACE | SDL_OPENGL | SDL_DOUBLEBUF);
+	auto window = make_resource(SDL_CreateWindow, SDL_DestroyWindow, 
+		"ProgNet", 
+		100, 
+		100, 
+		windowWidth, 
+		windowHeight, 
+		SDL_WINDOW_OPENGL);
+	
+	auto displayRenderer = make_resource(SDL_CreateRenderer, SDL_DestroyRenderer, 
+		window.get(), 
+		-1, 
+		SDL_RENDERER_ACCELERATED);
 	
 	if(window == NULL) {
 		cerr << "SDL failed to create a window." << endl;
@@ -91,7 +102,7 @@ void Interface::renderFunc() {
 					glPopMatrix();
 				}
 				
-				SDL_GL_SwapBuffers();
+				SDL_GL_SwapWindow(window.get());
 				
 			}
 			

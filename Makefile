@@ -1,8 +1,8 @@
 CC := g++
-LINK_FILES := -lGL -lGLU -lSDL -lSDL_image -lSDL_ttf -lv8 -Wl,-R/usr/lib/ -lpthread
+LINK_FILES := -lGL -lGLU -lSDL2 -lv8 -Wl,-R/usr/lib/ -lpthread
 export OBJ_HOME := $(realpath obj)
 export INCL_HOME := $(realpath include)
-export INCLUDES := -I/usr/include/GL/ -I/usr/include/SDL/ -I$(INCL_HOME)
+export INCLUDES := -I/usr/include/GL/ -I/usr/include/SDL2/ -I$(INCL_HOME)
 export CFLAGS := -Wall -Wswitch-enum -Werror $(INCLUDES) -std=gnu++11 -g
 CLIENT := prognet
 SERVER := server_prognet
