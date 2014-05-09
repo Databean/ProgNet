@@ -12,15 +12,14 @@ using std::cerr;
 using std::endl;
 
 int main(int argc, char** argv) {
+	if(argc < 2) {
+		cerr << "Usage: ./prognet program.js" << std::endl;
+		return -1;
+	}
 	//PixelBuffer screenPixels(windowWidth, windowHeight);
 	ShapeManager2d shapeManager;
 	
-	std::fstream f;
-	if(argc > 1) {
-		f.open(argv[1]);
-	} else {
-		f.open("script.js");
-	}
+	std::fstream f(argv[1], std::fstream::in);
 	std::string scriptStr;
 	std::getline(f, scriptStr, '\0');
 	
