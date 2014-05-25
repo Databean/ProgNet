@@ -7,6 +7,9 @@
 #include "Point.h"
 #include "PixelBuffer.h"
 
+template<unsigned int dim, class CoordType>
+class ShapeObserver;
+
 /**
  * Represents the various types of shapes that can be drawn by the user.
  */
@@ -22,11 +25,13 @@ bool validPointsInType(const ShapeType& shape, const unsigned int& numPoints);
 template<unsigned int dim, class CoordType>
 class Shape {
 private:
+	unsigned int id;
 	std::vector<Point<dim, CoordType>> points;
 	Point<dim, CoordType> off;
 	float rot;
 	Color col;
 	ShapeType ty;
+	ShapeObserver<dim, CoordType>* observer;
 	
 	template<class A, unsigned int B>
 	friend std::istream& operator>>(std::istream&, Shape&);
@@ -34,29 +39,19 @@ public:
 	typedef Shape<dim, CoordType> Type;
 	typedef Point<dim, CoordType> PointType;
 	
-	inline Shape() : points(), off(), rot(0.f), ty(SHAPE_NONE) {
+	inline Shape() : id(0), rot(0.f), ty(SHAPE_NONE), observer(nullptr) {
 		
 	}
 	
-	inline Shape(const ShapeType& type, const std::vector<PointType>& points) : points(points), off(), rot(0.f), ty(type) {
+	inline Shape(const ShapeType& type, int id, const std::vector<PointType>& points) : id(id), points(points), off(), rot(0.f), ty(type), observer(nullptr) {
 		if(!validPointsInType(type, points.size())) {
 			throw std::runtime_error("Invalid number of points in " + shapeName(type) + " shape: " + toStr(points.size()));
 		}
 	}
 	
-	inline Shape(const Type& other) : points(other.points), off(other.off), rot(other.rot), col(other.col), ty(other.ty) {
-		
-	}
-	
-	inline ~Shape() {
-		
-	}
-	
-	inline const Type& operator=(const Type& other) {
-		points = other.points;
-		ty = other.ty;
-		return *this;
-	}
+	inline Shape(const Type& other) = default;
+	inline ~Shape() = default;
+	inline Type& operator=(const Type& other) = default;
 	
 	inline PointType& operator[](const unsigned int& index) {
 		if(index < points.size()) {
@@ -82,6 +77,11 @@ public:
 		return off;
 	}
 	
+	inline void setOffset(const PointType& newOffset) {
+		offset = newOffset;
+		update();
+	}
+	
 	inline const PointType& offset() const {
 		return off;
 	}
@@ -94,6 +94,11 @@ public:
 		return rot;
 	}
 	
+	inline void setRotation(float newRotation) {
+		rot = newRotation;
+		update();
+	}
+	
 	inline Color& color() {
 		return col;
 	}
@@ -102,8 +107,27 @@ public:
 		return col;
 	}
 	
+	inline void setColor(const Color& newColor) {
+		col = newColor;
+		update();
+	}
+	
 	inline const ShapeType& type() const {
 		return ty;
+	}
+	
+	inline unsigned int getId() const {
+		return id;
+	}
+	
+	inline void update() {
+		if(observer) {
+			observer->update(*this);
+		}
+	}
+	
+	inline void setObserver(ShapeObserver<dim, CoordType>* observer) {
+		this->observer = observer;
 	}
 };
 
@@ -140,5 +164,16 @@ std::istream& operator>>(std::istream& in, const Shape<dim, CoordType>& shape) {
 	}
 	return in >> shape.ty;
 }
+
+template<unsigned int dim, class CoordType>
+class ShapeObserver {
+public:
+	ShapeObserver() = default;
+	ShapeObserver(const ShapeObserver&) = delete;
+	virtual ~ShapeObserver() = default;
+	virtual ShapeObserver& operator=(const ShapeObserver&) = delete;
+	
+	virtual void update(const Shape<dim, CoordType>& shape) = 0;
+};
 
 #endif

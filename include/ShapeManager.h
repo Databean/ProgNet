@@ -14,33 +14,23 @@
 #include "Shape.h"
 #include "Util.h"
 
-template<unsigned int dim, class CoordType>
-class ShapeManagerObserver;
-
 /**
  * 
  */
 template<unsigned int dim, class CoordType>
-class ShapeManager {
+class ShapeManager : public ShapeObserver<dim, CoordType> {
 private:
 	std::map<unsigned int, Shape<dim, CoordType>> shapes;
-	std::vector<std::reference_wrapper<ShapeManagerObserver<dim, CoordType>>> observers;
+	std::vector<std::reference_wrapper<ShapeObserver<dim, CoordType>>> observers;
 	unsigned int count;
 public:
 	typedef Point<dim, CoordType> PointType;
 	typedef Shape<dim, CoordType> ShapeType;
 	
-	ShapeManager() : shapes(), count(0) {
-		
-	}
-	ShapeManager(const ShapeManager& other) : shapes(other.shapes), count(other.count) {
-		
-	}
-	~ShapeManager() {}
-	ShapeManager& operator=(const ShapeManager& other) {
-		shapes = other.shapes;
-		count = other.count;
-	}
+	ShapeManager() : count(0) {}
+	ShapeManager(const ShapeManager& other) = default;
+	~ShapeManager() = default;
+	ShapeManager& operator=(const ShapeManager& other) = default;
 	
 	inline ShapeType& operator[](unsigned int index) {
 		if(shapes.count(index)) {
@@ -80,21 +70,22 @@ public:
 	
 	inline unsigned int makeQuad(const PointType& p1, const PointType& p2, const PointType& p3, const PointType& p4) {
 		unsigned int index = count;
-		shapes[index] = ShapeType(SHAPE_QUAD, {p1, p2, p3, p4});
+		shapes[index] = ShapeType(SHAPE_QUAD, index, {p1, p2, p3, p4});
+		shapes[index].setObserver(this);
 		count++;
 		return index;
 	}
 	
 	inline unsigned int makeTriangle(const PointType& p1, const PointType& p2, const PointType& p3) {
 		unsigned int index = count;
-		shapes[index] = (ShapeType(SHAPE_TRIANGLE, {p1, p2, p3}));
+		shapes[index] = ShapeType(SHAPE_TRIANGLE, index, {p1, p2, p3});
 		count++;
 		return index;
 	}
 	
 	inline unsigned int makeLine(const PointType& p1, const PointType& p2) {
 		unsigned int index = count;
-		shapes[index] = (ShapeType(SHAPE_LINE, {p1, p2}));
+		shapes[index] = ShapeType(SHAPE_LINE, index, {p1, p2});
 		count++;
 		return index;
 	}
@@ -107,24 +98,19 @@ public:
 		shapes.clear();
 	}
 	
-	inline void addObserver(ShapeManagerObserver<dim, CoordType>& observer) {
+	inline void addObserver(ShapeObserver<dim, CoordType>& observer) {
 		observers.push_back(std::ref(observer));
+	}
+	
+	void update(const Shape<dim, CoordType>& shape) {
+		for(auto& observer : observers) {
+			observer.get().update(shape);
+		}
 	}
 };
 
 typedef ShapeManager<2, double> ShapeManager2d;
 typedef ShapeManager<2, float> ShapeManager2f;
 typedef ShapeManager<2, int> ShapeManager2i;
-
-template<unsigned int dim, class CoordType>
-class ShapeManagerObserver {
-public:
-	ShapeManagerObserver() = default;
-	ShapeManagerObserver(const ShapeManagerObserver&) = delete;
-	virtual ~ShapeManagerObserver() = default;
-	virtual ShapeManagerObserver& operator=(const ShapeManagerObserver&) = delete;
-	
-	virtual void update(const ShapeManager<dim, CoordType>& shapeManager, const Shape<dim, CoordType>& shape) = 0;
-};
 
 #endif
