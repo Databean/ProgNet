@@ -1,5 +1,5 @@
 CC := g++
-LINK_FILES := -lGL -lGLU -lSDL2 -lv8 -Wl,-R/usr/lib/ -lpthread
+LINK_FILES := -lGL -lGLU -lSDL2 -lSDL2_net -lv8 -Wl,-R/usr/lib/ -lpthread
 export OBJ_HOME := $(realpath obj)
 export INCL_HOME := $(realpath include)
 export INCLUDES := -I/usr/include/GL/ -I/usr/include/SDL2/ -I$(INCL_HOME)
