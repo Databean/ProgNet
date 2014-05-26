@@ -6,6 +6,7 @@
 #include <thread>
 #include "GLShapeRenderer.h"
 #include "Interface.h"
+#include "Shape.h"
 
 using std::cout;
 using std::cerr;
@@ -16,8 +17,13 @@ int main(int argc, char** argv) {
 		cerr << "Usage: ./prognet program.js" << std::endl;
 		return -1;
 	}
+	
 	//PixelBuffer screenPixels(windowWidth, windowHeight);
 	ShapeManager2d shapeManager;
+	
+	ShapeObserverFn<2, double> obs {[](const Shape2d& shape) { cout << shape << endl; }};
+	
+	shapeManager.addObserver(obs);
 	
 	std::fstream f(argv[1], std::fstream::in);
 	std::string scriptStr;

@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <functional>
 
 #include "Point.h"
 #include "PixelBuffer.h"
@@ -179,6 +180,19 @@ public:
 	virtual ShapeObserver& operator=(const ShapeObserver&) = delete;
 	
 	virtual void update(const Shape<dim, CoordType>& shape) = 0;
+};
+
+template<unsigned int dim, class CoordType>
+class ShapeObserverFn : public ShapeObserver<dim, CoordType> {
+private:
+	std::function<void(const Shape<dim, CoordType>&)> fn;
+public:
+	ShapeObserverFn(std::function<void(const Shape<dim, CoordType>&)> fn) : fn(fn) {}
+	ShapeObserverFn(const ShapeObserverFn*) = delete;
+	virtual ~ShapeObserverFn() = default;
+	virtual ShapeObserverFn& operator=(const ShapeObserverFn&) = delete;
+	
+	virtual void update(const Shape<dim, CoordType>& shape) { fn(shape); }
 };
 
 #endif

@@ -72,6 +72,7 @@ public:
 		unsigned int index = count;
 		shapes[index] = ShapeType(SHAPE_QUAD, index, {p1, p2, p3, p4});
 		shapes[index].setObserver(this);
+		update(shapes[index]);
 		count++;
 		return index;
 	}
@@ -79,6 +80,8 @@ public:
 	inline unsigned int makeTriangle(const PointType& p1, const PointType& p2, const PointType& p3) {
 		unsigned int index = count;
 		shapes[index] = ShapeType(SHAPE_TRIANGLE, index, {p1, p2, p3});
+		shapes[index].setObserver(this);
+		update(shapes[index]);
 		count++;
 		return index;
 	}
@@ -86,6 +89,8 @@ public:
 	inline unsigned int makeLine(const PointType& p1, const PointType& p2) {
 		unsigned int index = count;
 		shapes[index] = ShapeType(SHAPE_LINE, index, {p1, p2});
+		shapes[index].setObserver(this);
+		update(shapes[index]);
 		count++;
 		return index;
 	}
