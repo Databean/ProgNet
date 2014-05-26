@@ -150,7 +150,7 @@ static Handle<ObjectTemplate> initShape() {
 		Shape2d& shape = (*manager)[shapeWrap->Value()];
 		Color* newColor = static_cast<Color*>(colorWrap->Value());
 		
-		shape.color() = (*newColor);
+		shape.setColor(*newColor);
 	};
 	
 	auto getOffset = [](Local<String> property, const v8::PropertyCallbackInfo<v8::Value>& info) {
@@ -177,7 +177,7 @@ static Handle<ObjectTemplate> initShape() {
 		Shape2d& shape = (*manager)[shapeWrap->Value()];
 		Point2d* newOffset = static_cast<Point2d*>(pointWrap->Value());
 		
-		shape.offset() = (*newOffset);
+		shape.setOffset(*newOffset);
 	};
 	
 	auto getRotation = [](Local<String> property, const v8::PropertyCallbackInfo<v8::Value>& info) {
@@ -199,7 +199,7 @@ static Handle<ObjectTemplate> initShape() {
 		ShapeManager2d* manager = static_cast<ShapeManager2d*>(managerWrap->Value());
 		Shape2d& shape = (*manager)[shapeWrap->Value()];
 		
-		shape.rotation() = value->NumberValue();
+		shape.setRotation(value->NumberValue());
 	};
 	
 	auto getPoint = [](unsigned int index, const v8::PropertyCallbackInfo<v8::Value>& info) {
@@ -226,7 +226,7 @@ static Handle<ObjectTemplate> initShape() {
 		Shape2d& shape = (*manager)[shapeWrap->Value()];
 		Point2d* newOffset = static_cast<Point2d*>(pointWrap->Value());
 		
-		shape[index] = (*newOffset);
+		shape.setPoint(index, *newOffset);
 		
 		//Returns to indicate that the access was intercepted.
 		//info.GetReturnValue() = value;

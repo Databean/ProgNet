@@ -69,6 +69,11 @@ public:
 		}
 	}
 	
+	inline void setPoint(const unsigned int& index, const PointType& newPoint) {
+		(*this)[index] = newPoint;
+		update();
+	}
+	
 	inline unsigned int numPoints() const {
 		return points.size();
 	}
@@ -78,7 +83,7 @@ public:
 	}
 	
 	inline void setOffset(const PointType& newOffset) {
-		offset = newOffset;
+		off = newOffset;
 		update();
 	}
 	
