@@ -2,6 +2,14 @@
 
 #include "Util.h"
 
+bostream& operator<<(bostream& out, ShapeType s) {
+	return out << (int) s;
+}
+
+bistream& operator>>(bistream& in, ShapeType& s) {
+	return in >> (int&) s;
+}
+
 /**
  * Produces a string representation of the various ShapeType enumeration members. Useful for debug output.
  */

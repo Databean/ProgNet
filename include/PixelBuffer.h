@@ -1,6 +1,8 @@
 #ifndef PIXEL_BUFFER_H
 #define PIXEL_BUFFER_H
 
+#include "BinaryStream.h"
+
 /**
  * Represents a color. Contains red, green, and blue elements, which range from
  * 0 to 255.
@@ -37,6 +39,9 @@ public:
 	virtual const Color& operator*=(unsigned char);
 	virtual const Color& operator/=(unsigned char);
 };
+
+bostream& operator<<(bostream& out, const Color& c);
+bistream& operator>>(bistream& in, Color& c);
 
 /**
  * @deprecated

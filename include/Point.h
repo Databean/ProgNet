@@ -1,6 +1,7 @@
 #ifndef POINT_H
 #define POINT_H
 
+#include "BinaryStream.h"
 #include "Util.h"
 
 /**
@@ -171,6 +172,22 @@ template<unsigned int dim, class CoordType>
 inline std::istream& operator>>(std::istream& in, Point<dim, CoordType>& pt) {
 	for(unsigned int i = 0; i < dim; i++) {
 		in >> pt[i];
+	}
+	return in;
+}
+
+template<unsigned int dim, class CoordType>
+bostream& operator<<(bostream& out, const Point<dim, CoordType>& point) {
+	for(int i = 0; i < dim; i++) {
+		out << point[i];
+	}
+	return out;
+}
+
+template<unsigned int dim, class CoordType>
+bistream& operator>>(bistream& in, Point<dim, CoordType>& point) {
+	for(int i = 0; i < dim; i++) {
+		in >> point[i];
 	}
 	return in;
 }

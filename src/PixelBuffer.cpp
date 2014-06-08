@@ -105,6 +105,14 @@ const Color& Color::operator/=(unsigned char i) {
 	return *this;
 }
 
+bostream& operator<<(bostream& out, const Color& c) {
+	return out << c.red() << c.green() << c.blue();
+}
+
+bistream& operator>>(bistream& in, Color& c) {
+	return in >> c.red() >> c.green() >> c.blue();
+}
+
 PixelBuffer::PixelBuffer(unsigned int xmax, unsigned int ymax) : xmax(xmax), ymax(ymax) {
 	data = new Color*[maxX()];
 	for(unsigned int x = 0; x < maxX(); x++) {
