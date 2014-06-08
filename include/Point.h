@@ -135,7 +135,7 @@ public:
 		return *this;
 	}
 	
-	inline bool operator==(const Type& other) {
+	inline bool operator==(const Type& other) const {
 		for(unsigned int i = 0; i < dim; i++) {
 			if(coords[i] != other[i]) {
 				return false;
@@ -144,7 +144,7 @@ public:
 		return true;
 	}
 	
-	inline bool operator!=(const Type& other) {
+	inline bool operator!=(const Type& other) const {
 		for(unsigned int i = 0; i < dim; i++) {
 			if(coords[i] != other[i]) {
 				return true;
@@ -159,10 +159,11 @@ public:
  */
 template<unsigned int dim, class CoordType>
 inline std::ostream& operator<<(std::ostream& strm, const Point<dim, CoordType>& pt) {
+	strm << "Point(";
 	for(unsigned int i = 0; i < dim - 1; i++) {
 		strm << pt[i] << " ";
 	}
-	return strm << pt[dim-1];
+	return strm << pt[dim-1] << ")";
 }
 
 /**
@@ -178,7 +179,7 @@ inline std::istream& operator>>(std::istream& in, Point<dim, CoordType>& pt) {
 
 template<unsigned int dim, class CoordType>
 bostream& operator<<(bostream& out, const Point<dim, CoordType>& point) {
-	for(int i = 0; i < dim; i++) {
+	for(unsigned int i = 0; i < dim; i++) {
 		out << point[i];
 	}
 	return out;
@@ -186,7 +187,7 @@ bostream& operator<<(bostream& out, const Point<dim, CoordType>& point) {
 
 template<unsigned int dim, class CoordType>
 bistream& operator>>(bistream& in, Point<dim, CoordType>& point) {
-	for(int i = 0; i < dim; i++) {
+	for(unsigned int i = 0; i < dim; i++) {
 		in >> point[i];
 	}
 	return in;

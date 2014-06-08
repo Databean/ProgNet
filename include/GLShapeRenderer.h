@@ -23,7 +23,6 @@ private:
 	const ShapeManager<dim, CoordType>& shapes;
 	
 	typedef Point<dim, CoordType> PointType;
-	typedef Shape<dim, CoordType> ShapeType;
 	typedef ShapeManager<dim, CoordType> ShapeManagerType;
 public:
 	GLShapeManagerComponent(const ShapeManagerType& shapes) : shapes(shapes) {}

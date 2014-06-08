@@ -1,5 +1,6 @@
 #include "Script.h"
-#include <SDL.h>
+#include "SDL.h"
+#include "SDL_net.h"
 #include <iostream>
 #include "ShapeManager.h"
 #include <stdint.h>
@@ -330,6 +331,35 @@ void makeQuad(const v8::FunctionCallbackInfo<v8::Value>& args) {
 
 void frameWait(const v8::FunctionCallbackInfo<v8::Value>& args) {
 	Interface::frameWait();
+	
+	Local<External> shapeManagerExternal = Local<External>::Cast(args.Callee()->Get(String::NewFromUtf8(Isolate::GetCurrent(), shapeManagerStr.c_str())));
+	ShapeManager2d* shapeManager = static_cast<ShapeManager2d*>(shapeManagerExternal->Value());
+	
+	UDPsocket socket = SDLNet_UDP_Open(0); // socket for writing.
+	
+	std::stringstream sstream;
+	bostream out(sstream);
+	out << *shapeManager;
+	
+	std::string str = sstream.str();
+	
+	UDPpacket* packet = SDLNet_AllocPacket(str.size());
+	
+	if(!packet) {
+		std::cerr << "SDLNet_AllocPacket: " << SDLNet_GetError() << std::endl;
+		// perhaps do something else since you can't make this packet
+	} else {
+		packet->len = str.size();
+		memcpy(packet->data, str.c_str(), str.size());
+		SDLNet_ResolveHost(&packet->address, "127.0.0.1", 54321);
+		
+		SDLNet_UDP_Send(socket, -1, packet);
+		
+		SDLNet_FreePacket(packet);
+	}
+	
+	SDLNet_UDP_Close(socket);
+	
 	args.GetReturnValue().Set(Boolean::New(Isolate::GetCurrent(), true));
 }
 
@@ -376,6 +406,8 @@ void V8Script::run(ShapeManager2d& pb) {
 	makeLineTemplate->Set(Isolate::GetCurrent(), shapeManagerStr.c_str(), shapeManagerWrap);
 	Local<FunctionTemplate> makeQuadTemplate = FunctionTemplate::New(Isolate::GetCurrent(), makeQuad);
 	makeQuadTemplate->Set(Isolate::GetCurrent(), shapeManagerStr.c_str(), shapeManagerWrap);
+	Local<FunctionTemplate> frameWaitTemplate = FunctionTemplate::New(Isolate::GetCurrent(), frameWait);
+	frameWaitTemplate->Set(Isolate::GetCurrent(), shapeManagerStr.c_str(), shapeManagerWrap);
 	
 	//Local<FunctionTemplate> getShapeTemplate = FunctionTemplate::New(Isolate::GetCurrent(), getShape);
 	//getShapeTemplate->Set(shapeManagerStr.c_str(), External::New(&pb));
@@ -390,7 +422,7 @@ void V8Script::run(ShapeManager2d& pb) {
 	global->Set(String::NewFromUtf8(Isolate::GetCurrent(), "makeTriangle"), makeTriangleTemplate);
 	global->Set(String::NewFromUtf8(Isolate::GetCurrent(), "makeLine"), makeLineTemplate);
 	global->Set(String::NewFromUtf8(Isolate::GetCurrent(), "makeQuad"), makeQuadTemplate);
-	global->Set(String::NewFromUtf8(Isolate::GetCurrent(), "frameWait"), FunctionTemplate::New(Isolate::GetCurrent(), frameWait));
+	global->Set(String::NewFromUtf8(Isolate::GetCurrent(), "frameWait"), frameWaitTemplate);
 	global->Set(String::NewFromUtf8(Isolate::GetCurrent(), "getMouseX"), FunctionTemplate::New(Isolate::GetCurrent(), getMouseX));
 	global->Set(String::NewFromUtf8(Isolate::GetCurrent(), "getMouseY"), FunctionTemplate::New(Isolate::GetCurrent(), getMouseY));
 	

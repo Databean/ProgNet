@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <vector>
 #include <functional>
+#include <iostream>
 
 #include "Point.h"
 #include "PixelBuffer.h"
@@ -14,7 +15,7 @@ class ShapeObserver;
 /**
  * Represents the various types of shapes that can be drawn by the user.
  */
-enum ShapeType { SHAPE_TRIANGLE, SHAPE_QUAD, SHAPE_POINT, SHAPE_LINE, SHAPE_POLYGON, SHAPE_TRIANGLE_FAN, SHAPE_NONE };
+enum class ShapeType : int { SHAPE_TRIANGLE = 0, SHAPE_QUAD, SHAPE_POINT, SHAPE_LINE, SHAPE_POLYGON, SHAPE_TRIANGLE_FAN, SHAPE_NONE };
 
 bostream& operator<<(bostream& out, ShapeType);
 bistream& operator>>(bistream& in, ShapeType&);
@@ -34,7 +35,7 @@ private:
 	float rot;
 	Color col;
 	ShapeType ty;
-	ShapeObserver<dim, CoordType>* observer;
+	//ShapeObserver<dim, CoordType>* observer;
 	
 	template<class A, unsigned int B>
 	friend std::istream& operator>>(std::istream&, Shape&);
@@ -42,11 +43,11 @@ public:
 	typedef Shape<dim, CoordType> Type;
 	typedef Point<dim, CoordType> PointType;
 	
-	inline Shape() : rot(0.f), ty(SHAPE_NONE), observer(nullptr) {
+	inline Shape() : rot(0.f), ty(ShapeType::SHAPE_NONE)/*, observer(nullptr) */ {
 		
 	}
 	
-	inline Shape(const ShapeType& type, const std::vector<PointType>& points) : points(points), off(), rot(0.f), ty(type), observer(nullptr) {
+	inline Shape(const ShapeType& type, const std::vector<PointType>& points) : points(points), off(), rot(0.f), ty(type) /*, observer(nullptr) */{
 		if(!validPointsInType(type, points.size())) {
 			throw std::runtime_error("Invalid number of points in " + shapeName(type) + " shape: " + toStr(points.size()));
 		}
@@ -133,13 +134,25 @@ public:
 	}
 	
 	inline void update() {
-		if(observer) {
+		/*if(observer) {
 			observer->update(*this);
+		}*/
+	}
+	
+	inline bool operator==(const Shape<dim, CoordType>& other) const {
+		if(numPoints() != other.numPoints()) {
+			return false;
 		}
+		for(unsigned int i = 0; i < numPoints(); i++) {
+			if((*this)[i] != other[i]) {
+				return false;
+			}
+		}
+		return rotation() == other.rotation() && color() == other.color() && type() == other.type();
 	}
 	
 	inline void setObserver(ShapeObserver<dim, CoordType>* observer) {
-		this->observer = observer;
+		//this->observer = observer;
 	}
 };
 
@@ -155,11 +168,11 @@ typedef Shape<2, int> Shape2i;
  */
 template<unsigned int dim, class CoordType>
 std::ostream& operator<<(std::ostream& out, const Shape<dim, CoordType>& shape) {
-	out << shape.numPoints() << " ";
+	out << "Shape(" << shape.numPoints() << " ";
 	for(unsigned int i = 0; i < shape.numPoints(); i++) {
 		out << shape[i] << " ";
 	}
-	return out << shape.type();
+	return out << shapeName(shape.type()) << ", " << shape.offset() << ", " << shape.rotation() << ", " << shape.color() << ")";
 }
 
 /**
@@ -179,9 +192,9 @@ std::istream& operator>>(std::istream& in, const Shape<dim, CoordType>& shape) {
 
 template<unsigned int dim, class CoordType>
 bostream& operator<<(bostream& out, const Shape<dim, CoordType>& shape) {
-	out << shape.type();
 	out << shape.numPoints();
-	for(int i = 0; i < shape.numPoints(); i++) {
+	out << shape.type();
+	for(unsigned int i = 0; i < shape.numPoints(); i++) {
 		out << shape[i];
 	}
 	return out << shape.offset() << shape.rotation() << shape.color();
@@ -191,8 +204,9 @@ template<unsigned int dim, class CoordType>
 bistream& operator>>(bistream& in, Shape<dim, CoordType>& shape) {
 	ShapeType type;
 	std::vector<Point<dim, CoordType>> points;
-	std::size_t size;
-	in >> type >> size;
+	unsigned int size;
+	in >> size >> type;
+	std::cout << shapeName(type) << ": " << size << std::endl;
 	for(std::size_t i = 0; i < size; i++) {
 		Point<dim, CoordType> point;
 		in >> point;

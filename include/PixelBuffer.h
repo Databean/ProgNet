@@ -43,6 +43,8 @@ public:
 bostream& operator<<(bostream& out, const Color& c);
 bistream& operator>>(bistream& in, Color& c);
 
+std::ostream& operator<<(std::ostream&, Color);
+
 /**
  * @deprecated
  * Represents a virtual screen of pixels, where all the pixel colors are set individually. This has been

@@ -10,25 +10,25 @@ using std::runtime_error;
  */
 GLenum shapeTypeToGLType(ShapeType type) {
 	switch(type) {
-		case SHAPE_TRIANGLE:
+		case ShapeType::SHAPE_TRIANGLE:
 			return GL_TRIANGLES;
 			break;
-		case SHAPE_QUAD:
+		case ShapeType::SHAPE_QUAD:
 			return GL_QUADS;
 			break;
-		case SHAPE_POINT:
+		case ShapeType::SHAPE_POINT:
 			return GL_POINTS;
 			break;
-		case SHAPE_LINE:
+		case ShapeType::SHAPE_LINE:
 			return GL_LINES;
 			break;
-		case SHAPE_POLYGON:
+		case ShapeType::SHAPE_POLYGON:
 			return GL_POLYGON;
 			break;
-		case SHAPE_TRIANGLE_FAN:
+		case ShapeType::SHAPE_TRIANGLE_FAN:
 			return GL_TRIANGLE_FAN;
 			break;
-		case SHAPE_NONE:
+		case ShapeType::SHAPE_NONE:
 			return GL_POINTS;
 			break;
 	}

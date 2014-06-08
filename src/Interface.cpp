@@ -1,7 +1,13 @@
 #include "Interface.h"
-#include <SDL.h>
-#include <SDL_opengl.h>
+
 #include <iostream>
+#include <sstream>
+
+#include "SDL.h"
+#include "SDL_opengl.h"
+#include "SDL_net.h"
+
+#include "BinaryStream.h"
 #include "GLShapeRenderer.h"
 
 using std::cout;
@@ -39,6 +45,11 @@ void Interface::renderFunc() {
 	if(sdlStatus < 0) {
 		cerr << "SDL failed to initialize." << endl;
 		exit(sdlStatus);
+	}
+	
+	if(SDLNet_Init()==-1) {
+		std::cerr <<  "SDLNet_Init: " << SDLNet_GetError() << std::endl;
+		exit(2);
 	}
 	
 	auto window = make_resource(SDL_CreateWindow, SDL_DestroyWindow, 

@@ -113,6 +113,10 @@ bistream& operator>>(bistream& in, Color& c) {
 	return in >> c.red() >> c.green() >> c.blue();
 }
 
+std::ostream& operator<<(std::ostream& out, Color c) {
+	return out << "Color(" << (int)c.red() << ", " << (int)c.green() << ", " << (int)c.blue() << ")";
+}
+
 PixelBuffer::PixelBuffer(unsigned int xmax, unsigned int ymax) : xmax(xmax), ymax(ymax) {
 	data = new Color*[maxX()];
 	for(unsigned int x = 0; x < maxX(); x++) {
